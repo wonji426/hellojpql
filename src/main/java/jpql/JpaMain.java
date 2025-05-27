@@ -31,13 +31,9 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query1 = "select m from Member m join m.team t";
-            String query2 = "select m from Member m left join m.team t";
-            String query3 = "select m from Member m, Team t where m.username = t.name";
-            String query4 = "select m from Member m left join m.team t on t.name = 'teamA'";
-            String query5 = "select m from Member m left join Team t on m.username = t.name";
+            String query = "select m from Member m join m.team t";
 
-            List<Member> result = em.createQuery(query5, Member.class)
+            List<Member> result = em.createQuery(query, Member.class)
                     .getResultList();
 
             tx.commit(); //커밋시 SQL문 나감
