@@ -23,6 +23,7 @@ public class JpaMain {
             Member member = new Member();
             member.setUsername("member1");
             member.setAge(10);
+            member.setType(MemberType.ADMIN);
 
             member.setTeam(team);
 
@@ -31,10 +32,15 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select m from Member m join m.team t";
+            String query = "select m.username, 'HELLO', true from Member m " +
+                    "where m.type = jpql.MemberType.ADMIN";
+            List<Object[]> result = em.createQuery(query).getResultList();
 
-            List<Member> result = em.createQuery(query, Member.class)
-                    .getResultList();
+            for (Object[] o : result) {
+                System.out.println("o = " + o[0]);
+                System.out.println("o = " + o[1]);
+                System.out.println("o = " + o[2]);
+            }
 
             tx.commit(); //커밋시 SQL문 나감
         } catch (Exception e) {
