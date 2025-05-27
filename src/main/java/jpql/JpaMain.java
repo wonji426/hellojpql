@@ -1,11 +1,8 @@
 package jpql;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-
 import java.util.List;
+
 
 public class JpaMain {
 
@@ -24,23 +21,21 @@ public class JpaMain {
             member.setAge(10);
             em.persist(member);
 
-            TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class);
-            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
-            Query query3 = em.createQuery("select m.username, m.age from Member m");
+            em.flush();
+            em.clear();
 
-            List<Member> resultList = query1.getResultList();
-            for (Member member1 : resultList) {
-                System.out.println("member1 = " + member1);
-            }
+            List<Member> result = em.createQuery("select m from Member m", Member.class)
+                    .getResultList();
 
-            TypedQuery<Member> query4 = em.createQuery("select m from Member m where m.id = 1", Member.class);
-            Member singleResult = query4.getSingleResult();
-            System.out.println("singleResult = " + singleResult);
+            Member findMember = result.get(0);
+            findMember.setAge(20);
 
-            TypedQuery<Member> query5 = em.createQuery("select m from Member m where m.username = :username", Member.class);
-            query5.setParameter("username", "member1");
-            Member singleResult1 = query5.getSingleResult();
-            System.out.println("singleResult1 = " + singleResult1.getUsername());
+            List<MemberDTO> resultList = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+                    .getResultList();
+
+            MemberDTO memberDTO = resultList.get(0);
+            System.out.println("memberDTO.getUsername() = " + memberDTO.getUsername());
+            System.out.println("memberDTO.getAge() = " + memberDTO.getAge());
 
             tx.commit(); //커밋시 SQL문 나감
         } catch (Exception e) {
