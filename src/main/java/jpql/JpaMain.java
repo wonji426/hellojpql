@@ -21,34 +21,38 @@ public class JpaMain {
             em.persist(team);
 
             Member member = new Member();
-            member.setUsername(null);
+            member.setUsername("관리자1");
             member.setAge(10);
             member.setType(MemberType.ADMIN);
 
+            Member member2 = new Member();
+            member2.setUsername("관리자2");
+            member2.setAge(10);
+            member2.setType(MemberType.ADMIN);
+
             member.setTeam(team);
+            member2.setTeam(team);
 
             em.persist(member);
+            em.persist(member2);
 
             em.flush();
             em.clear();
 
-            String query1 =
-                    "SELECT " +
-                            "case when m.age <= 10 then '학생요금' " +
-                            "when m.age >= 60 then '경로요금' " +
-                            "else '일반요금' " +
-                            "end " +
-                    "from Member m";
-            List<String> result = em.createQuery(query1, String.class).getResultList();
+            String query1 = "select concat('a', 'b') from Member m";
+            String query2 = "select substring(m.username, 2, 3) from Member m";
+            String query3 = "select locate('de', 'abcdefg') from Member m";
+            String query4 = "select size(t.members) from Team t";
 
-            for (String s : result) {
+            List<Integer> result = em.createQuery(query4, Integer.class).getResultList();
+
+            for (Integer s : result) {
                 System.out.println("s = " + s);
             }
 
-            String query2 = "select coalesce(m.username, '이름 없는 회원') from Member m";
-            List<String> result2 = em.createQuery(query2, String.class).getResultList();
-
-            for (String s : result2) {
+            String query = "select group_concat(m.username) from Member m";
+            List<String> result1 = em.createQuery(query, String.class).getResultList();
+            for (String s : result1) {
                 System.out.println("s = " + s);
             }
 
