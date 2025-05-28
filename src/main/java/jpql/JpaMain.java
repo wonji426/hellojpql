@@ -39,22 +39,28 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query1 = "select concat('a', 'b') from Member m";
-            String query2 = "select substring(m.username, 2, 3) from Member m";
-            String query3 = "select locate('de', 'abcdefg') from Member m";
-            String query4 = "select size(t.members) from Team t";
+            String query = "select m.team from Member m";
+            List<Team> result = em.createQuery(query, Team.class).getResultList();
 
-            List<Integer> result = em.createQuery(query4, Integer.class).getResultList();
-
-            for (Integer s : result) {
+            for (Team s : result) {
                 System.out.println("s = " + s);
             }
 
-            String query = "select group_concat(m.username) from Member m";
-            List<String> result1 = em.createQuery(query, String.class).getResultList();
-            for (String s : result1) {
+            String query2 = "select t.members from Team t";
+            List<Member> result2 = em.createQuery(query2, Member.class).getResultList();
+
+            for (Member s : result2) {
                 System.out.println("s = " + s);
             }
+
+            String query3 = "select SIZE(t.members) from Team t";
+            List<String> result3 = em.createQuery(query3, String.class).getResultList();
+            System.out.println("result3 = " + result3);
+
+            String query4 = "select m.username from Team t join t.members m";
+            List<String> result4 = em.createQuery(query4, String.class).getResultList();
+            System.out.println("result3 = " + result4);
+
 
             tx.commit(); //커밋시 SQL문 나감
         } catch (Exception e) {
