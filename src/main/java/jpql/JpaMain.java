@@ -44,24 +44,23 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query1 = "select m from Member m join fetch m.team";
-            String query2 = "select distinct t from Team t join fetch t.members";
-            String query = "select t from Team t";
+            String query = "select m from Member m where m.id = :memberId";
 
-            List<Team> result = em.createQuery(query, Team.class)
-                    .setFirstResult(0)
-                    .setMaxResults(2)
+            Member findMember = em.createQuery(query, Member.class)
+                    .setParameter("memberId", member1.getId())
+                    .getSingleResult();
+
+            System.out.println("findMember = " + findMember);
+
+            String query2 = "select m from Member m where m.team = :team";
+
+            List<Member> findMember2 = em.createQuery(query2, Member.class)
+                    .setParameter("team", teamA)
                     .getResultList();
 
-            System.out.println("result = " + result.size());
-
-            for (Team team : result) {
-                System.out.println("team = " + team.getName() + " | " + team.getMembers().size());
-                for (Member member : team.getMembers()) {
-                    System.out.println(" -> member = " + member);
-                }
+            for (Member member : findMember2) {
+                System.out.println("member = " + member);
             }
-
 
             tx.commit(); //커밋시 SQL문 나감
         } catch (Exception e) {
