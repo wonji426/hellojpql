@@ -1,6 +1,8 @@
 package jpql;
 
 import jakarta.persistence.*;
+
+import java.util.Collection;
 import java.util.List;
 
 
@@ -16,50 +18,43 @@ public class JpaMain {
 
         try {
 
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
 
-            Member member = new Member();
-            member.setUsername("관리자1");
-            member.setAge(10);
-            member.setType(MemberType.ADMIN);
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
+
+            Member member1 = new Member();
+            member1.setUsername("회원1");
+            member1.setTeam(teamA);
+            em.persist(member1);
 
             Member member2 = new Member();
-            member2.setUsername("관리자2");
-            member2.setAge(10);
-            member2.setType(MemberType.ADMIN);
-
-            member.setTeam(team);
-            member2.setTeam(team);
-
-            em.persist(member);
+            member2.setUsername("회원2");
+            member2.setTeam(teamA);
             em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setTeam(teamB);
+            em.persist(member3);
 
             em.flush();
             em.clear();
 
-            String query = "select m.team from Member m";
+            String query1 = "select m from Member m join fetch m.team";
+            String query = "select distinct t from Team t join fetch t.members";
+
             List<Team> result = em.createQuery(query, Team.class).getResultList();
 
-            for (Team s : result) {
-                System.out.println("s = " + s);
+            for (Team team : result) {
+                System.out.println("team = " + team.getName() + " | " + team.getMembers().size());
+                for (Member member : team.getMembers()) {
+                    System.out.println(" -> member = " + member);
+                }
             }
-
-            String query2 = "select t.members from Team t";
-            List<Member> result2 = em.createQuery(query2, Member.class).getResultList();
-
-            for (Member s : result2) {
-                System.out.println("s = " + s);
-            }
-
-            String query3 = "select SIZE(t.members) from Team t";
-            List<String> result3 = em.createQuery(query3, String.class).getResultList();
-            System.out.println("result3 = " + result3);
-
-            String query4 = "select m.username from Team t join t.members m";
-            List<String> result4 = em.createQuery(query4, String.class).getResultList();
-            System.out.println("result3 = " + result4);
 
 
             tx.commit(); //커밋시 SQL문 나감
