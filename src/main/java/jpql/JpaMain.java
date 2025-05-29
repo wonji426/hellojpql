@@ -41,16 +41,13 @@ public class JpaMain {
             member3.setTeam(teamB);
             em.persist(member3);
 
-            em.flush();
-            em.clear();
+            // 자동 em.flush();
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate(); // 데이터베이스로 바로 쿼리 날림
 
-            List<Member> result = em.createNamedQuery("Member.findByUsername", Member.class)
-                    .setParameter("username", "회원1")
-                    .getResultList();
+            em.clear(); // 하지 않으면 영속성 컨텍스트에 있는 0살 가져온다. 클리어 후 데이터베이스에서 가져와야한다.
 
-            for (Member member : result) {
-                System.out.println("member = " + member);
-            }
+            System.out.println("resultCount = " + resultCount);
 
             tx.commit(); //커밋시 SQL문 나감
         } catch (Exception e) {
